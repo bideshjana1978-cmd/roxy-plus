@@ -480,7 +480,12 @@ module.exports = (client) => {
             return { id, username: u ? u.username : 'Unknown User', avatar: u ? u.displayAvatarURL({ dynamic: true }) : 'https://cdn.discordapp.com/embed/avatars/0.png' };
         });
 
-        res.json({ ...data, enrichedServers, enrichedChannels, enrichedGroups, enrichedFreeWill, enrichedUsers });
+        const enrichedBlockedUsers = (data.blockedUsers || []).map(id => {
+            const u = client.users.cache.get(id);
+            return { id, username: u ? u.username : 'Unknown User', avatar: u ? u.displayAvatarURL({ dynamic: true }) : 'https://cdn.discordapp.com/embed/avatars/0.png' };
+        });
+
+        res.json({ ...data, enrichedServers, enrichedChannels, enrichedGroups, enrichedFreeWill, enrichedUsers, enrichedBlockedUsers });
     });
 
     app.post('/api/ai', (req, res) => {

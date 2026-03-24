@@ -26,7 +26,9 @@ const DEFAULT_CONFIG = {
     personality: "Friendly, helpful, and sometimes sarcastic.",
     rules: "Keep responses concise. Do not ping @everyone.",
     modelType: "slow",
-    bannedWords: ["age", "year old", "y/o", "birth"]
+    bannedWords: ["age", "year old", "y/o", "birth"],
+    disablePing: false,
+    blockedUsers: []
 };
 
 function loadData() {
@@ -194,6 +196,11 @@ function initialize(client) {
                 return;
             }
 
+            // Blocklist Users Check
+            if (config.blockedUsers && config.blockedUsers.includes(authorId)) {
+                return;
+            }
+
             // Flags
             let shouldReply = false;
             let freeWillDelay = 0;
@@ -270,7 +277,10 @@ function initialize(client) {
 
                     if (reply && reply.trim().length > 0) {
                         try {
-                            await message.reply(reply);
+                            await message.reply({ 
+                                content: reply, 
+                                allowedMentions: { repliedUser: !config.disablePing } 
+                            });
                         } catch (e) {
                             // Fallback: If reply fails (e.g. Invalid Form Body), try normal send
                             // console.warn("[AI] Reply failed, attempting plain send...", e.message);
